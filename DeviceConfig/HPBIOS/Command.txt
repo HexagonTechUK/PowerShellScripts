@@ -1,0 +1,2 @@
+.\BIOSConfigUtility64.exe /GetConfig:C:\ProgramData\_MEM\Config.txt"
+.\BIOSConfigUtility64.exe /SetConfig:C:\ProgramData\_MEM\Config.txt"
