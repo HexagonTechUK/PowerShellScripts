@@ -7,7 +7,7 @@
     The output includes package ID, name, version, and source. The resulting HTML file is then opened automatically in the default browser.
 
 .PARAMETER
-    None
+    None.
 
 .OUTPUTS
     HTML file saved to: C:\ProgramData\_MEM\winget-packages.html
