@@ -6,10 +6,6 @@
     This script checks for and installs necessary PowerShell modules required for interacting with Azure services. It goes on to check
     age of files from the Azure storage container and proceed to remediation if they are newer or missing locally. 
 
-
-.EXAMPLE
-    .\Set-ScreensaverSlideshow[Detection].ps1
-
 .NOTES
     Author: Paul Gosling, Hexagon Technology Services
     Last Edit: 2025-02-12
