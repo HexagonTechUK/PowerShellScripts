@@ -1,0 +1,23 @@
+<Configuration ID="04816f4a-d4a3-449c-9839-6c1ed6df6e2c">
+  <Info Description="" />
+  <Add OfficeClientEdition="64" Channel="Current" OfficeMgmtCOM="TRUE">
+    <Product ID="O365ProPlusRetail">
+      <Language ID="en-gb" />
+      <ExcludeApp ID="Access" />
+      <ExcludeApp ID="Excel" />
+      <ExcludeApp ID="Groove" />
+      <ExcludeApp ID="Lync" />
+      <ExcludeApp ID="OneDrive" />
+      <ExcludeApp ID="OneNote" />
+      <ExcludeApp ID="Outlook" />
+      <ExcludeApp ID="PowerPoint" />
+      <ExcludeApp ID="Teams" />
+      <ExcludeApp ID="Word" />
+      <ExcludeApp ID="Bing" />
+    </Product>
+  </Add>
+  <AppSettings>
+    <Setup Name="Company" Value="Persimmon Homes" />
+  </AppSettings>
+  <Display Level="Full" AcceptEULA="TRUE" />
+</Configuration>
