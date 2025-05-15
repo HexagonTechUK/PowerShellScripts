@@ -6,9 +6,6 @@
     This script checks for and installs necessary PowerShell modules required for interacting with Azure services. It goes on to retrieve
     files from the Azure storage container and downloads them to the local system.
 
-.EXAMPLE
-    .\Set-ScreensaverSlideshow[Remediation].ps1
-
 .NOTES
     Author: Paul Gosling, Hexagon Technology Services
     Last Edit: 2025-02-12
