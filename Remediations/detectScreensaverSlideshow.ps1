@@ -18,8 +18,8 @@
 
 # Define Variables (complete these)
 
-$deployType  = "Set" # Deployment type: Install, Upgrade, Removal
-$productName = "ScreensaverSlideshow-Detection" # Application name for logfile and installation
+$deployType  = "detect" # Deployment type: Install, Upgrade, Removal
+$productName = "ScreensaverSlideshow" # Application name for logfile and installation
 $destFolder = "C:\ProgramData\_MEM\Screensavers"
 $storageAccountName = ""
 $containerName = ""
