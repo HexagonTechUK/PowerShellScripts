@@ -89,4 +89,6 @@ function CheckAndUpdateScreensavers {
     }
 }
 
+CheckAndUpdateScreensavers
+
 # End of script
