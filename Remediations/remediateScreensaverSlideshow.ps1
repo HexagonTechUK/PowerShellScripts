@@ -17,81 +17,39 @@
 
 # Define Variables (complete these)
 
-$deployType  = "Set" # Deployment type: Install, Upgrade, Removal
-$productName = "ScreensaverSlideshow-Remediation" # Application name for logfile and installation
-$logFileName = Join-Path $env:ProgramData "_MEM\$deployType-$productName.log" # Define path for logging
+$deployType  = "remediate" # Deployment type: Install, Upgrade, Removal
+$productName = "ScreensaverSlideshow" # Application name for logfile and installation
+$destFolder = "C:\ProgramData\_MEM\Screensavers"
+$storageAccountName = ""
+$resourceGroupName = ""
+$containerName = ""
+$blobPrefix = ""
+$logFileName = Join-Path $env:ProgramData "_MEM\$deployType-$productName.log"  #---# Path to script logfile
 
-# Start logging
+# Define credentials
+$securePassword = ConvertTo-SecureString -String "" -AsPlainText -Force
+$tenantId = ''
+$subscriptionID = ''
+$applicationId = ''
+$credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $applicationId, $securePassword
 
-Start-Transcript -Path $logFileName
+# Create the log file if it doesn't exist
+if (-not (Test-Path $logFileName)) {
+    New-Item -Path $logFileName -ItemType File -Force
+}
 
-# Function to get logged-on users
-function Get-LoggedOnUsers {
-    [CmdletBinding()]
-    param(
-        # If $server is not specified, runs against the local machine
-        $server
+# Function to write log messages
+function Write-Log {
+    param (
+        [string]$Message
     )
-
-    $header = @('USERNAME', 'SESSIONNAME', 'ID', 'STATE', 'IDLE TIME', 'LOGON TIME')
-
-    try {
-        $result = if ($server) { query user /server:$server } else { query user }
-
-        # Determine column indexes dynamically
-        $indexes = $header | ForEach-Object { ($result[0]).IndexOf(" $_") }
-
-        # Process each row to a PS object, skipping the header
-        for ($row = 1; $row -lt $result.Count; $row++) {
-            $obj = New-Object psobject
-
-            for ($i = 0; $i -lt $header.Count; $i++) {
-                $begin = $indexes[$i]
-                $end = if ($i -lt $header.Count - 1) { $indexes[$i+1] } else { $result[$row].length }
-
-                $obj | Add-Member NoteProperty $header[$i] ($result[$row].substring($begin, $end-$begin)).Trim()
-            }
-
-            Write-Output $obj
-        }
-    }
-    catch {
-        # Handle query failure
-        if ($_.Exception.Message -ne 'No User exists for *') {
-            Write-Error $_.Exception.Message
-        }
-    }
+    $timestamp = (Get-Date).ToString("yyyy-MM-dd HH:mm")
+    "$timestamp | $Message" | Out-File -FilePath $logFileName -Append
+    Write-Output "$timestamp | $Message"
 }
 
 # Set working directory to script root
 Set-Location -Path $PSScriptRoot
-
-# Obtain install command line
-$productName = "ScreensaverSlideshow[Remediation]"
-
-# Get information about logged-on user
-$userInfo = Get-LoggedOnUsers
-$username = $userInfo.USERNAME
-
-# Check if $env:HomeDrive or $username are null or empty
-if (-not $env:HomeDrive) {
-    Write-Host "Error: HomeDrive is null or empty."
-}
-
-if (-not $username) {
-    Write-Host "Error: Username is null or empty."
-}
-
-# If both variables are not null or empty, proceed with Join-Path
-if ($env:HomeDrive -and $username) {
-    $userProfilePath = Join-Path -Path ($env:HomeDrive, "users", $username) -ChildPath "\"
-}
-
-$loggedOnUser = Get-ItemPropertyValue "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Authentication\LogonUI\SessionData\$($userInfo.ID)" -Name LoggedOnUser -ErrorAction SilentlyContinue 
-
-# Output user profile path and logged-on user name
-Write-Host $userProfilePath
-Write-Host $loggedOnUser
 
 <# Check if NuGet is installed, if not, install it
 Register-PackageSource -Name NuGet.org -Location https://www.nuget.org/api/v2/ -ProviderName NuGet -Trusted -Force
@@ -108,22 +66,8 @@ foreach ($module in $requiredModules) {
     }
 }#>
 
-# Define credentials
-$securePassword = ConvertTo-SecureString -String "" -AsPlainText -Force
-$tenantId = ''
-$subscriptionID = ''
-$applicationId = ''
-$credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $applicationId, $securePassword
-
 # Connect to Azure
 Connect-AzAccount -ServicePrincipal -TenantId $tenantId -SubscriptionID $subscriptionID -Credential $credential
-
-# Define variables
-$destFolder = "C:\ProgramData\_MEM\Screensavers"
-$storageAccountName = ""
-$resourceGroupName = ""
-$containerName = "images"
-$blobPrefix = "Screensavers/"
 
 # Create destination folder if it doesn't exist
 if (-not (Test-Path $destFolder)) {
@@ -150,12 +94,11 @@ function UpdateScreensavers {
         # Download the blob
         $localFilePath = Join-Path -Path $destFolder -ChildPath $blobName
         Get-AzStorageBlobContent -Blob $blob.Name -Container $containerName -Context $context -Destination $localFilePath -Verbose
-        Write-Output "Downloaded: $blobName"        
+        Write-Log "Downloaded: $blobName"        
     }
 }
 
 # Call the function to update screensavers
 UpdateScreensavers
 
-# Conclude logging
-Stop-Transcript
+# End of script
