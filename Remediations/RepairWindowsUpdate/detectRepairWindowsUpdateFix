@@ -1,0 +1,29 @@
+﻿# Define the registry checks
+$registryChecks = @(
+    @{Path="HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender"; Name="DisableAntiSpyware"},
+    @{Path="HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate"; Name="DoNotConnectToWindowsUpdateInternetLocations"},
+    @{Path="HKLM:\SOFTWARE\Policies\Microsoft\WindowsStore"; Name="RemoveWindowsStore"},
+    @{Path="HKCU:\Software\Policies\Microsoft\WindowsStore"; Name="RequirePrivateStoreOnly"},
+    @{Path="HKLM:\SOFTWARE\Policies\Microsoft\WindowsStore"; Name="DisableAutoInstall"},
+    @{Path="HKCU:\Software\Policies\Microsoft\WindowsStore"; Name="DisableAutoInstall"}
+)
+
+foreach ($check in $registryChecks) {
+    if (Test-Path $check.Path) {
+        try {
+            $currentValue = Get-ItemPropertyValue -Path $check.Path -Name $check.Name -ErrorAction Stop
+            if ($currentValue -eq 1 -or $currentValue -eq 2) {
+                Write-Host "The key '$($check.Name)' at '$($check.Path)' is set to $currentValue. Exiting with code 1."
+                exit 1
+            } else {
+                Write-Host "The key '$($check.Name)' at '$($check.Path)' is not set to 1 or 2 (current value: $currentValue)."
+            }
+        } catch {
+            Write-Host "The key '$($check.Name)' does not exist at '$($check.Path)'."
+        }
+    } else {
+        Write-Host "The path '$($check.Path)' does not exist."
+    }
+}
+
+Write-Host "Completed registry checks. No keys requiring action found."

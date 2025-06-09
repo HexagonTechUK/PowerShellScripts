@@ -1,0 +1,228 @@
+﻿# Intunewinapp wrapper##
+# for Persimmon Homes PH
+# steve.barker@sistena.co.uk
+
+# load a function
+function Get-LoggedOnUsers{
+    [cmdletbinding()]
+    param(
+        #if $server is not specified runs against the local machine
+        $server
+    )
+
+
+    $header=@('USERNAME', 'SESSIONNAME', 'ID', 'STATE', 'IDLE TIME', 'LOGON TIME')
+write-host "Now running from $(Get-Date) " -f Red
+
+    try{
+        $result=if($server){query user /server:$server}
+                else {query user}
+
+        #lets not assume the column width are the same every time
+        $indexes = $header | ForEach-Object {($result[0]).IndexOf(" $_")}        
+
+        #process each row to a PS object, skip the header
+        for($row=1; $row -lt $result.Count; $row++){
+            $obj=New-Object psobject
+
+            for($i=0; $i -lt $header.Count; $i++){
+                $begin=$indexes[$i]
+                $end=if($i -lt $header.Count-1) {$indexes[$i+1]} else {$result[$row].length}
+
+                $obj | Add-Member NoteProperty $header[$i] ($result[$row].substring($begin, $end-$begin)).trim()
+            }
+
+            Write-Output $obj
+        }
+    }
+
+    catch{
+        #make the distinction between no results vs. query failure
+        if($_.exception.message -ne 'No User exists for *'){
+            Write-Error $_.exception.message
+        }
+    }
+}
+
+Set-Location $PSScriptRoot
+
+# complete the variables below:
+# Obtain install command line
+$productname = "Windows Update Repair - Remediation"
+
+# For the following variables, we call the function above (Get-loggedonusers)
+
+$userinfo = Get-LoggedOnUsers
+$username = $userinfo.USERNAME
+$userprofilepath = $env:homedrive,"users",$username -join "\"
+$UserNAME = Get-ItemPropertyValue "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Authentication\LogonUI\SessionData\$($userinfo.ID)" -Name LoggedOnUser -ErrorAction SilentlyContinue 
+write-host $userprofilepath
+write-host $UserNAME
+
+
+# Start Transcript in PH folder
+$Transcriptlogfilename = $env:ProgramData+"\PH\installwrapper-"+$productname+".log"
+Start-Transcript -Path $Transcriptlogfilename -Append
+
+# App Specific
+
+##set win updates reg keys to not configured
+# Define the path to the registry key and the name of the DWORD
+$registryPath = "HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender"
+$DWORDName = "DisableAntiSpyware"
+
+# Check if the registry key exists
+if (Test-Path $registryPath) {
+    # Set the DWORD value to 0
+    Set-ItemProperty -Path $registryPath -Name $DWORDName -Value 0
+    Write-Host "Successfully set DisableAntiSpyware to 0."
+} else {
+    Write-Host "Registry key does not exist."
+}
+
+
+# Define the registry paths
+$registryPaths = @(
+    "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate",
+    "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update"
+)
+
+foreach ($regPath in $registryPaths) {
+    if (Test-Path $regPath) {
+        $values = Get-ItemProperty -Path $regPath
+        foreach ($valueName in $values.PSObject.Properties.Name) {
+            Set-ItemProperty -Path $regPath -Name $valueName -Value 0
+        }
+        Write-Output "All values under $regPath have been set to 0."
+    } else {
+        New-Item -Path $regPath -Force
+        # Add more specific DWORD values here if needed
+        Write-Output "$regPath created."
+    }
+}
+
+
+##set win updates reg keys to not configured
+# Define the path to the registry key and the name of the DWORD
+$registryPath = "HKLM:	Software\Policies\Microsoft\Windows\WindowsUpdate"
+$DWORDName = "DoNotConnectToWindowsUpdateInternetLocations"
+
+# Check if the registry key exists
+if (Test-Path $registryPath) {
+    # Set the DWORD value to 0
+    Set-ItemProperty -Path $registryPath -Name $DWORDName -Value 0
+    Write-Host "Successfully set 	DoNotConnectToWindowsUpdateInternetLocations to 0."
+} else {
+    Write-Host "Registry key does not exist."
+}
+
+
+#set store reg keys to not configured
+# Define the registry paths
+$registryPaths = @(
+    "HKLM:\SOFTWARE\Policies\Microsoft\WindowsStore",
+    "HKCU:\Software\Policies\Microsoft\WindowsStore"
+)
+
+$keysToSet = @(
+    "RemoveWindowsStore",
+    "RequirePrivateStoreOnly",
+    "DisableAutoInstall"
+)
+
+foreach ($regPath in $registryPaths) {
+    if (-not (Test-Path $regPath)) {
+        New-Item -Path $regPath -Force
+    }
+    
+    foreach ($key in $keysToSet) {
+        New-ItemProperty -Path $regPath -Name $key -Value 0 -PropertyType DWORD -Force -ErrorAction SilentlyContinue
+    }
+}
+
+
+
+Write-Output "Script execution completed."
+
+#Sync Device
+Get-ScheduledTask | where {$_.TaskName -eq 'PushLaunch'} | Start-ScheduledTask
+
+# Start deployment here
+
+$Descriptive = Get-Date
+
+# Create a system restore point
+Write-Host "Creating a system restore point..."
+Checkpoint-Computer -Description "Restore point for win update fix $Descriptive" -RestorePointType "MODIFY_SETTINGS" -ErrorAction SilentlyContinue
+
+# Stop the win updates related services
+Write-Host "Stopping the win updates related services..."
+Stop-Service -Name BITS -Force
+Stop-Service -Name wuauserv -Force
+Stop-Service -Name cryptsvc -Force
+
+# Deleting qmgr*.dat files...
+Write-Host "Deleting qmgr*.dat files..."
+Remove-Item -Path "$env:ALLUSERSPROFILE\Application Data\Microsoft\Network\Downloader\qmgr*.dat" -Force
+
+# Renaming folders to *.BAK...
+Write-Host "Renaming folders to *.BAK..."
+Rename-Item -Path "$env:SystemRoot\SoftwareDistribution\DataStore" -NewName "DataStore.bak" -Force
+Rename-Item -Path "$env:SystemRoot\SoftwareDistribution\Download" -NewName "Download.bak" -Force
+Rename-Item -Path "$env:SystemRoot\System32\catroot2" -NewName "catroot2.bak" -Force
+Rename-Item -Path "C:\Windows\SoftwareDistribution" -NewName "SoftwareDistribution.old" -Force
+
+# Resetting the BITS service and the Windows Update service to the default security descriptor...
+Write-Host "Resetting the BITS service and the Windows Update service to the default security descriptor..."
+sc.exe sdset bits 'D:(A;CI;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;SY)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;BA)(A;;CCLCSWLOCRRC;;;IU)(A;;CCLCSWLOCRRC;;;SU)'
+sc.exe sdset wuauserv 'D:(A;;CCLCSWRPLORC;;;AU)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;BA)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;SY)'
+
+# Moving to system32 directory...
+Set-Location -Path "${env:windir}\system32"
+
+# Restarting the BITS service, the Windows Update service and the Cryptographic service...
+Write-Host "Restarting the BITS service, the Windows Update service and the Cryptographic service..."
+Start-Service -Name BITS
+Start-Service -Name wuauserv
+Start-Service -Name cryptsvc
+
+# Set variables to indicate value and key to set
+$RegistryPath = 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate'
+$Name         = 'DisableDualScan'
+$Value        = '0'
+
+# Now set the value
+New-ItemProperty -Path $RegistryPath -Name $Name -Value $Value -PropertyType DWORD -Force -ErrorAction SilentlyContinue
+
+# Remove all variables used in previous run of script
+Remove-Variable * -ErrorAction SilentlyContinue
+
+# Repeat 1
+
+# Set variables to indicate value and key to set
+$RegistryPath = 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate'
+$Name         = 'DoNotConnectToWindowsUpdateInternetLocations'
+$Value        = '0'
+# Create the key if it does not exist
+
+# Now set the value
+New-ItemProperty -Path $RegistryPath -Name $Name -Value $Value -PropertyType DWORD -Force -ErrorAction SilentlyContinue
+
+
+# Remove all variables used in previous run of script
+Remove-Variable * -ErrorAction SilentlyContinue
+
+# Repeat 2 
+
+# Set variables to indicate value and key to set
+$RegistryPath = 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU'
+$Name         = 'NoAutoUpdate'
+$Value        = '0'
+# Create the key if it does not exist
+ 
+# Now set the value
+New-ItemProperty -Path $RegistryPath -Name $Name -Value $Value -PropertyType DWORD -Force -ErrorAction SilentlyContinue
+
+Invoke-Expression -Command "SFC /SCANNOW" -Verbose
+Invoke-Expression -Command "DISM /online /cleanup-image /restorehealth" -Verbose
+Write-Host "Script completed successfully!"
