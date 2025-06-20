@@ -11,7 +11,7 @@
 
 .NOTES
     File Name : Show-LAPSPasswordGUI.ps1
-    Author    : Paul Gosling, Hexagon Technology Services
+    Author    : Paul Gosling, Hexagon Technology Consulting
     Created   : 2025-05-08
     Version   : 1.0
     Requires  : Active Directory module, LAPS module, .NET Windows Forms

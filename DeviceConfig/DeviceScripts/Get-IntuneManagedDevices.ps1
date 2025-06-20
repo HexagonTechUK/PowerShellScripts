@@ -16,7 +16,7 @@
 
 .NOTES
     File Name : Get-IntuneManagedDevices.ps1  
-    Author    : Paul Gosling, Hexagon Technology Services  
+    Author    : Paul Gosling, Hexagon Technology Consulting  
     Created   : 2025-05-14  
     Version   : 1.0 - Initial script  
     Requires  : Microsoft Graph permissions for deviceManagementManagedDevices.Read.All (App only)

@@ -14,7 +14,7 @@
 
 .NOTES
     File Name : Get-7zipVersion.ps1  
-    Author    : Paul Gosling, Hexagon Technology Services  
+    Author    : Paul Gosling, Hexagon Technology Consulting  
     Created   : 2025-05-14  
     Requires  : WinGet, Windows 10/11
 #>

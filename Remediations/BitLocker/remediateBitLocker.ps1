@@ -25,7 +25,7 @@
 
 .NOTES
     File Name : Remediate-BitLocker.ps1  
-    Author    : Paul Gosling, Hexagon Technology Services  
+    Author    : Paul Gosling, Hexagon Technology Consulting  
     Created   : 2025-05-14  
     Version   : 1.0 - Initial Script  
     Requires  : Admin rights, BitLocker module, Azure AD joined machine for key backup

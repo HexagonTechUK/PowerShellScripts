@@ -10,7 +10,7 @@
     .\InstallWrapper.ps1
 
 .NOTES
-    Author: Paul Gosling, Hexagon Technology Services
+    Author: Paul Gosling, Hexagon Technology Consulting
     Last Edit: 2024-09-16
     Version: 1.0
 #>

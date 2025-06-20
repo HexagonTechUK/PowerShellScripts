@@ -11,7 +11,7 @@
 
 .NOTES
 	File Name : Set-ScreenSaverPath.ps1 
-    Author    : Paul Gosling, Hexagon Technology Services
+    Author    : Paul Gosling, Hexagon Technology Consulting
     Last Edit : 2024-04-19
     Version   : 1.0
 #>

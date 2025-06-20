@@ -10,7 +10,7 @@
     .\Install-DesktopIcons[Remediation].ps1
 
 .NOTES
-    Author: Paul Gosling, Hexagon Technology Services
+    Author: Paul Gosling, Hexagon Technology Consulting
     Last Edit: 2025-02-03
     Version: 1.0
 #>

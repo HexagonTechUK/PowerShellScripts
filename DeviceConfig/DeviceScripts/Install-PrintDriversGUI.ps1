@@ -27,7 +27,7 @@
 
 .NOTES
     File Name : Install-PrintDrivers.ps1  
-    Author    : Paul Gosling, Hexagon Technology Services  
+    Author    : Paul Gosling, Hexagon Technology Consulting  
     Created   : 2025-05-12  
     Version   : 1.0 - Initial Script  
     Requires  : PowerShell 5.1+, PresentationFramework, interactive session, optional: Schedule-DeleteOnReboot function

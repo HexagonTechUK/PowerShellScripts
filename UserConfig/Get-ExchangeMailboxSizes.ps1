@@ -16,7 +16,7 @@
 
 .NOTES
     File Name : Get-MailboxUsageReport.ps1
-    Author    : Paul Gosling, Hexagon Technology Services
+    Author    : Paul Gosling, Hexagon Technology Consulting
     Created   : 2025-05-08
     Version   : 1.0
     Requires  : ExchangeOnlineManagement module  

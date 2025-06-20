@@ -7,7 +7,7 @@
     age of files from the Azure storage container and proceed to remediation if they are newer or missing locally. 
 
 .NOTES
-    Author: Paul Gosling, Hexagon Technology Services
+    Author: Paul Gosling, Hexagon Technology Consulting
     Last Edit: 2025-02-12
     Version: 1.3
 #>

@@ -15,7 +15,7 @@
 
 .NOTES
     File Name : Get-BitLockerStatus.ps1  
-    Author    : Paul Gosling, Hexagon Technology Services  
+    Author    : Paul Gosling, Hexagon Technology Consulting  
     Created   : 2025-05-08  
     Version   : 1.0 - Initial Script  
      Requires : PowerShell 5.1+, BitLocker feature enabled, administrative privileges

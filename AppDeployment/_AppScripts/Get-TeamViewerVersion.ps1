@@ -9,7 +9,7 @@
 
 .NOTES
     Filename  : Get-TeamViewerVersion.ps1
-    Author    : Paul Gosling, Hexagon Technology Services  
+    Author    : Paul Gosling, Hexagon Technology Consulting  
     Created   : 2025-05-06  
     Version   : 1.0 - Initial Script
     Requires  : Administrator privileges

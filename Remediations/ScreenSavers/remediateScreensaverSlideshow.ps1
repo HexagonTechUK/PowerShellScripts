@@ -7,7 +7,7 @@
     files from the Azure storage container and downloads them to the local system.
 
 .NOTES
-    Author: Paul Gosling, Hexagon Technology Services
+    Author: Paul Gosling, Hexagon Technology Consulting
     Last Edit: 2025-02-12
     Version: 1.3
 #>

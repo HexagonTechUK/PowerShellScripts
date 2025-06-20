@@ -15,7 +15,7 @@
 
 .NOTES
     File Name : Remove-AdobeAcrobatXI.ps1  
-    Author    : Paul Gosling, Hexagon Technology Services  
+    Author    : Paul Gosling, Hexagon Technology Consulting  
     Created   : 2025-05-15  
     Version   : 1.0 - Initial Script  
     Requires  : {Write any requirements or prerequisites for this script}  

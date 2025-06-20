@@ -11,7 +11,7 @@
     .\Detect-Version.ps1
 
 .NOTES
-    Author: Paul Gosling, Hexagon Technology Services
+    Author: Paul Gosling, Hexagon Technology Consulting
     Last Edit: 2025-03-03
     Version: 5.1.7.138
 #>

@@ -8,7 +8,7 @@
    Multiple methods are used to attempt uninstall. Where not applicable, these are commented out.
 
 .NOTES
-    Author: Paul Gosling, Hexagon Technology Services
+    Author: Paul Gosling, Hexagon Technology Consulting
     Last Edit: 2025-03-03
     Version: 1.0
 #>

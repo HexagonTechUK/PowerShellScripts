@@ -16,7 +16,7 @@
 
 .NOTES
     File Name : Get-OdbcDsn.ps1
-    Author    : Paul Gosling, Hexagon Technology Services
+    Author    : Paul Gosling, Hexagon Technology Consulting
     Created   : 2025-05-06
     Version   : 1.0
     Requires  : PowerShell 5.1 or later, appropriate registry access permissions.

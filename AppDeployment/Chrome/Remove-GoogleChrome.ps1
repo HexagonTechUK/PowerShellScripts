@@ -14,7 +14,7 @@
 
 .NOTES
     File Name : Remove-GoogleChrome.ps1  
-    Author    : Paul Gosling, Hexagon Technology Services  
+    Author    : Paul Gosling, Hexagon Technology Consulting  
     Created   : 2025-05-14  
     Version   : 1.0  
     Requires  : WinGet v1.4+, Windows 10/11, internet access
